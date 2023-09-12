@@ -20,6 +20,7 @@ from pydub import AudioSegment
 
 logger = logging.getLogger(__name__)
 
+openai.api_key = os.environ.get("OPENAI_API_KEY")
 
 class SocketBlueprint(Blueprint):
     def __init__(self, sio: AsyncServer, socketio_path, *args, **kwargs):
@@ -242,7 +243,11 @@ class SocketIOInput(InputChannel):
 
             received_file = 'output_' + sid + '.mp3'
             with open(received_file, "rb") as source:
-                transcript = openai.Audio.transcribe('whisper-1', source)
+                transcript = openai.Audio.transcribe(
+                                        file = received_file,
+                                        model = "whisper-1",
+                                        response_format="text",
+                                        language="en")
 
             
             logger.info(transcript)
