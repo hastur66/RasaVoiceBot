@@ -1,0 +1,44 @@
+version: '3.0'
+
+networks:
+  voice_net:
+    external: false
+
+services:
+  voicebot_core:
+    build: ./
+    container_name: voicebot_core
+    restart: always
+    networks:
+      - voice_net
+    volumes:
+      - ./:/app/
+    command:
+      - "run"
+      - "--enable-api"
+      - "--cors"
+      - "*"
+      - "--credential"
+      - "credentials.yml"
+      - "--endpoints"
+      - "endpoints.yml"
+      - "--port"
+      - "5005"
+    links:
+      - voicebot_actions
+    ports:
+      - "5005:5005"
+    expose: [5005]
+
+
+  voicebot_actions:
+    build: ./actions
+    container_name: voicebot_actions
+    restart: always
+    networks:
+      - voice_net
+    volumes:
+      - ./actions:/app/actions
+    expose: [5055]
+    env_file:
+      - .env
